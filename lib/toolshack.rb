@@ -1,7 +1,8 @@
 
 require 'tempfile'
 
-# A collection of tools for my tests. 
+# A collection of tools for my tests. These are things that I use all over the
+# place and that I just don't want to write again. 
 #
 module Toolshack
   # Creates a temporary directory and returns its path to the caller. Note
