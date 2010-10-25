@@ -28,4 +28,32 @@ describe Toolshack do
       call.should_not == call
     end  
   end
+  describe "<- .tempdir_for" do
+    tempdir_for(:each, 'tempdir_for')
+    subject { tempdir }
+    
+    it { should_not be_nil }
+    it "should be a directory" do
+      File.directory?(tempdir).should == true
+    end 
+    
+    2.times do |i|
+      # Create and clean a tempdir twice. There should be no junk left lying 
+      # around.
+      let(:tempdirs) { [] }
+      
+      context "when creating more than one temporary directory (#{i+1})" do
+        tempdir_for(:each, 'tempdir_for')
+        
+        before(:each) { tempdirs << tempdir }
+        
+        it "should have at most one directory alive" do
+          (tempdirs - Array(tempdir)).each do |path|
+            File.exist?(path).should == false
+          end
+        end 
+      end
+    end
+    
+  end
 end

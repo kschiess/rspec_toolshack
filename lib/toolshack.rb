@@ -5,6 +5,10 @@ require 'tempfile'
 # place and that I just don't want to write again. 
 #
 module Toolshack
+  def self.included(by)
+    by.extend(ClassMethods)
+  end
+  
   # Creates a temporary directory and returns its path to the caller. Note
   # that this can also be used in block style: 
   #
@@ -37,26 +41,27 @@ module Toolshack
   end
   module_function :temporary_directory
 
-  # Use this in rspec to create and manage a tempdir at the same time. Roughly
-  # aequivalent to this: 
-  #
-  #   attr_reader :tempdir
-  #   around(scope) { |example|
-  #     temporary_directory do |path|
-  #       @tempdir = path
-  #       example.run
-  #     end
-  #   end
-  # 
-  def tempdir_for(scope, name=:tempdir)
-    attr_reader name
+  module ClassMethods
+    # Use this in rspec to create and manage a tempdir at the same time. Roughly
+    # aequivalent to this: 
+    #
+    #   attr_reader :tempdir
+    #   around(scope) { |example|
+    #     temporary_directory do |path|
+    #       @tempdir = path
+    #       example.run
+    #     end
+    #   end
+    # 
+    def tempdir_for(scope, base, name=:tempdir)
+      attr_reader name
 
-    around(scope) { |example|
-      temporary_directory do |path|
-        instance_variable_set("@#{name}", path)
-        example.run
-      end
-    }
+      around(scope) { |example|
+        temporary_directory(base) do |path|
+          instance_variable_set("@#{name}", path)
+          example.run
+        end
+      }
+    end
   end
-  module_function :tempdir_for
 end
